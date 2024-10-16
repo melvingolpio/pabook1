@@ -3,7 +3,7 @@
     require('../dbconn.php'); 
 
     if (!isset($_SESSION['username']) || $_SESSION['type'] != 'User') {
-        header("Location: ../login.php"); 
+        header("Location: ../index.php"); 
         exit();
     }
 

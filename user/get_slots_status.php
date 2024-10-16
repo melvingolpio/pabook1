@@ -1,15 +1,13 @@
 <?php
 require('../dbconn.php');
 
-// Fetch the parking slot statuses from the database
-$query = "SELECT slot_id, status FROM parking_slots";
+$query = "SELECT slot_number, status FROM reservations";
 $result = $conn->query($query);
 
-$slots_status = [];
+$statuses = [];
 while ($row = $result->fetch_assoc()) {
-    $slots_status[] = $row;
+    $statuses[] = $row;
 }
 
-// Return the slot statuses as JSON
-echo json_encode($slots_status);
+echo json_encode($statuses);
 ?>

@@ -1,14 +1,13 @@
 <?php
 require('../dbconn.php');
 
-// Make sure to fetch slot data for all slots, not just one user
-$query = "SELECT slot_number, status FROM reservations";  // Fetch status for all slots
+$query = "SELECT slot_number, status FROM reservations";
 $result = $conn->query($query);
 
 $statuses = [];
 while ($row = $result->fetch_assoc()) {
-    $statuses[] = $row;  // Store all slot data in an array
+    $statuses[] = $row;  // Store each slot's status
 }
 
-echo json_encode($statuses);  // Return JSON response for all slots
+echo json_encode($statuses);  // Output all slot statuses as JSON
 ?>

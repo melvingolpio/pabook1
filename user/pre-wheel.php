@@ -67,6 +67,28 @@ body {
     right: 10px;
     transition: all 0.3s ease;
 }
+
+/* Default car icon styling */
+.fas.fa-car {
+    color: #000;  /* Default icon color */
+    font-size: 24px;
+}
+
+/* Available slot: Icon turns green */
+.fas.fa-car.available {
+    color: green;
+}
+
+/* Reserved slot: Icon turns yellow */
+.fas.fa-car.reserved {
+    color: yellow;
+}
+
+/* Occupied slot: Icon turns red */
+.fas.fa-car.occupied {
+    color: red;
+}
+
 .cancel-btn:hover {
     font-size: 16px;
 }

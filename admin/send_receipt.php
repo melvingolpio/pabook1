@@ -148,13 +148,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_result($expirationDate);
         $stmt->fetch();
 
-        if (strtotime($expirationDate) > time()) {
+        // Debugging expiration date value
+        echo "<pre>";
+        var_dump($expirationDate, time(), strtotime($expirationDate));
+        echo "</pre>";
+
+        if (!empty($expirationDate) && strtotime($expirationDate) > time()) {
             echo "<script>alert('Your QR code was already sent and the token has not expired.');</script>";
             echo "<script>window.location.href = 'payment_verification.php';</script>";
             exit();
         }
     }
 
+    // Proceed with token generation
     if (generateReceipt($userId, $plateNumber, $conn)) {
         if (sendReceiptEmail($userId, $plateNumber, $conn)) {
             echo "<script>alert('QR code generated and email sent successfully!');</script>";
@@ -168,6 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>window.location.href = 'payment_verification.php';</script>";
     exit();
 }
+
 
 $user_id = $_SESSION['id'];
 $image_query = "SELECT image FROM users WHERE id = ?";

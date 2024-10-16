@@ -207,19 +207,20 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.style.display = "none";
     }
 
-    confirmBtn.onclick = function () {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "reserve_slot.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                alert(xhr.responseText);
-                fetchSlotStatuses();  // Update the slots after reservation
-                modal.style.display = "none";
-            }
-        };
-        xhr.send("slot=" + selectedSlot);
-    }
+confirmBtn.onclick = function () {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "reserve_slot.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            alert(xhr.responseText);
+            fetchSlotStatuses();  // Update the slots after reservation
+            modal.style.display = "none";
+        }
+    };
+    xhr.send("slot=" + selectedSlot);
+}
+
 
     window.onclick = function (event) {
         if (event.target == modal) {

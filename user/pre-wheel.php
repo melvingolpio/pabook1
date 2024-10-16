@@ -217,7 +217,7 @@ $show_vehicle_type = ($user_role === 'president' || $user_role === 'vice_preside
 
         function fetchParkingStatus() {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "get_parking_status.php", true);
+            xhr.open("GET", "get_slots_status.php", true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     var slots = JSON.parse(xhr.responseText);

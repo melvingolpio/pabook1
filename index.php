@@ -65,7 +65,7 @@ if (isset($_POST['signin'])) {
 </head>
 <body>
     <div class="wrapper">
-        <form action="login.php" method="post">
+        <form action="index.php" method="post">
             <h1 class="h2">Login</h1>
             <div class="input-box">
                 <input type="text" name="username" placeholder="Username" required>

@@ -1,10 +1,15 @@
 <?php
-session_start();
-require('../dbconn.php');
+$host = "us-cluster-east-01.k8s.cleardb.net";
+$username = "b5f6a402460fa3";
+$password = "83f06a6b"; 
+$dbname = "heroku_706906bb621a740";
 
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['slot_id']) && isset($_GET['status'])) {
-    $slot_id = intval($_GET['slot_id']);
-    $status = $_GET['status'];
+$conn = new mysqli($host, $username, $password, $dbname);
+
+// Change the request method to POST
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['slot_id']) && isset($_POST['status'])) {
+    $slot_id = intval($_POST['slot_id']);
+    $status = $_POST['status'];
 
     // Prepare the statement for updating the parking slot status
     $sql_update_slot = "UPDATE parking_slots SET status = ? WHERE slot_id = ?";
@@ -49,14 +54,16 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['slot_id']) && isset($_GE
         }
 
         error_log("Parking slot status updated to $status for slot ID: $slot_id\n");
+        echo json_encode(["success" => true, "message" => "Status updated"]);
     } else {
         error_log("Error updating parking slot status: " . htmlspecialchars($stmt_update_slot->error) . "\n");
+        echo json_encode(["success" => false, "message" => "Error updating status"]);
     }
 
     $stmt_update_slot->close();
 } else {
     error_log("Invalid request.\n");
+    echo json_encode(["success" => false, "message" => "Invalid request"]);
 }
 
 $conn->close();
-?>

@@ -1,4 +1,3 @@
-<?php
 session_start();
 require('../dbconn.php');
 include('../vendor/phpqrcode/qrlib.php');
@@ -18,27 +17,67 @@ function generateReceipt($userId, $plateNumber, $conn) {
     $uniqueToken = md5(uniqid($plateNumber, true));
     $expirationDate = date('Y-m-d H:i:s', strtotime('+1 year'));
     $createdAt = date('Y-m-d H:i:s');
-    $receiptUrl = "http://localhost/pms-sample/user/transaction.php?token=$uniqueToken";
-
+    
+    // Generate QR code as base64 string instead of saving as a file
     $qr_content = "Receipt Token: $uniqueToken\nCreated At: $createdAt";
-    $qr_dir = 'qrcodes2/';
-    if (!file_exists($qr_dir)) {
-        mkdir($qr_dir, 0755, true);
-    }
+    ob_start();
+    QRcode::png($qr_content, null, QR_ECLEVEL_L, 10);
+    $qr_image_data = ob_get_contents();
+    ob_end_clean();
 
-    $qr_file = $qr_dir . $plateNumber . '_qrcode.png';
-    QRcode::png($qr_content, $qr_file, QR_ECLEVEL_L, 10);
+    $qr_base64 = base64_encode($qr_image_data);
 
-    if (!file_exists($qr_file)) {
-        die("QR code generation failed.");
-    }
-
-    $stmt = $conn->prepare("INSERT INTO receipts (user_id, plate_number, receipt_token, expiration_date, qr_code, created_at) VALUES (?, ?, ?, ?, ?, ?)
+    // Insert into database
+    $stmt = $conn->prepare("INSERT INTO receipts (user_id, plate_number, receipt_token, expiration_date, qr_code, created_at) 
+                            VALUES (?, ?, ?, ?, ?, ?)
                             ON DUPLICATE KEY UPDATE receipt_token = VALUES(receipt_token), expiration_date = VALUES(expiration_date), qr_code = VALUES(qr_code), created_at = VALUES(created_at)");
-    $stmt->bind_param('isssss', $userId, $plateNumber, $uniqueToken, $expirationDate, $qr_file, $createdAt);
-    if ($stmt->execute()) {
+    $stmt->bind_param('isssss', $userId, $plateNumber, $uniqueToken, $expirationDate, $qr_base64, $createdAt);
+    return $stmt->execute();
+}
+
+function sendReceiptEmail($userId, $plateNumber, $conn) {
+    $stmt = $conn->prepare("SELECT qr_code FROM receipts WHERE user_id = ? AND plate_number = ?");
+    $stmt->bind_param('is', $userId, $plateNumber);
+    $stmt->execute();
+    $stmt->bind_result($qr_base64);
+    $stmt->fetch();
+    $stmt->close();
+
+    if (empty($qr_base64)) {
+        return false;
+    }
+
+    $sql_user_info = "SELECT email, username FROM users WHERE id = ?";
+    $stmt_user_info = $conn->prepare($sql_user_info);
+    $stmt_user_info->bind_param('i', $userId);
+    $stmt_user_info->execute();
+    $result_user_info = $stmt_user_info->get_result();
+    $user_info = $result_user_info->fetch_assoc();
+
+    $email = $user_info['email'];
+    $username = $user_info['username'];
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = getenv('SMTP_USERNAME'); // Use Heroku environment variables
+        $mail->Password   = getenv('SMTP_PASSWORD');
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        $mail->setFrom('pabookna@gmail.com', 'Pabook');
+        $mail->addAddress($email);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Your PaBook Reservation';
+        $mail->Body    = "Dear $username,<br><br>We successfully verified your payment. Below is the QR code.<br><br><img src='data:image/png;base64,$qr_base64' alt='QR Code'><br><br>Drive safely,<br>PaBook Team";
+        $mail->AltBody = "Dear $username,\n\nWe successfully verified your payment. Please find the QR code attached.\n\nDrive safely,\nPaBook Team";
+
+        $mail->send();
         return true;
-    } else {
+    } catch (Exception $e) {
         return false;
     }
 }

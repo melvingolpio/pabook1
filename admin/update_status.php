@@ -20,12 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['slot_id']) && isset($_
         // Log the update for parking slot
         error_log("Parking slot status updated to $status for slot ID: $slot_id\n");
 
-        // Handle reservation status update
+        // Handle reservation table updates
         if ($status === 'available') {
-            // If slot is available, delete corresponding reservation
+            // If the slot is available, delete the corresponding reservation
             error_log("Attempting to delete reservation for slot ID: $slot_id\n");
 
-            $sql_delete_reservation = "DELETE FROM reservations WHERE slot_id = ? AND status = 'reserved'";
+            $sql_delete_reservation = "DELETE FROM reservations WHERE slot_id = ?";
             $stmt_delete_reservation = $conn->prepare($sql_delete_reservation);
             $stmt_delete_reservation->bind_param('i', $slot_id);
 

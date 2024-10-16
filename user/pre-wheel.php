@@ -3,7 +3,7 @@ session_start();
 require('../dbconn.php'); 
 
 if (!isset($_SESSION['username']) || $_SESSION['type'] != 'User') {
-    header("Location: ../index.php"); 
+    header("Location: ../login.php"); 
     exit();
 }
 
@@ -26,9 +26,18 @@ if (!$vehicle) {
     exit();
 }
 
+$reservation_query = "SELECT * FROM parking_slots";
+$reservation_result = $conn->query($reservation_query);
+
+$reservations = [];
+while ($row = $reservation_result->fetch_assoc()) {
+    $reservations[$row['slot_id']] = array('status' => $row['status']);
+}
+
 $user_role = $_SESSION['role'];
 $show_timer = !($user_role === 'president' || $user_role === 'vice_president');
 $show_vehicle_type = ($user_role === 'president' || $user_role === 'vice_president');
+
 ?>
 
 <!DOCTYPE html>
@@ -41,62 +50,41 @@ $show_vehicle_type = ($user_role === 'president' || $user_role === 'vice_preside
     <link rel="stylesheet" href="assets/css/pree-wheel.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
+    <style>
+        .box {
+            position: relative;
+        }
+        .cancel-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid #c0392b;
+        }
+        .cancel-btn:hover {
+            background-color: darkred;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .cancel-btn:active {
+            background-color: maroon;
+            transform: scale(0.95);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
-
-<style>
-body {
-    user-select:none;
-}
-.box {
-    position: relative;
-}
-.cancel-btn {
-    background-color: #1a74e2;
-    color: white;
-    border: none;
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    transition: all 0.3s ease;
-}
-
-/* Default car icon styling */
-.fas.fa-car {
-    color: #000;  /* Default icon color */
-    font-size: 24px;
-}
-
-/* Available slot: Icon turns green */
-.fas.fa-car.available {
-    color: green;
-}
-
-/* Reserved slot: Icon turns yellow */
-.fas.fa-car.reserved {
-    color: yellow;
-}
-
-/* Occupied slot: Icon turns red */
-.fas.fa-car.occupied {
-    color: red;
-}
-
-.cancel-btn:hover {
-    font-size: 16px;
-}
-.cancel-btn:active {
-    transform: scale(0.95);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-</style>
 <body>
     <div class="main">
         <h2>Vehicle Details</h2>
@@ -108,20 +96,42 @@ body {
             </a>
         </div>
         <div class="box-container">
-            <?php for ($i = 1; $i <= 6; $i++): ?>
-            <div class="box box<?php echo $i; ?>" data-slot="<?php echo $i; ?>">
-                <div class="text">
-                    <h2 class="topic-heading">Slot <?php echo $i; ?></h2>
-                    <h2 class="topic selected-slot">Status: <span class="status-text" id="status-<?php echo $i; ?>">Loading...</span></h2>
-                    <?php if ($show_vehicle_type): ?>
-                        <h2 class="topic selected-slot">Vehicle type: <?php echo htmlspecialchars($vehicle['vehicle_type']); ?></h2>
-                        <?php if ($user_role === 'president' || $user_role === 'vice_president'): ?>
-                            <button class="cancel-btn" data-slot="<?php echo $i; ?>">X</button>
+            <?php for ($i = 1; $i <= 25; $i++): ?>
+                <?php 
+                $is_disabled = isset($reservations[$i]) && in_array($reservations[$i]['status'], ['reserved', 'occupied']);
+                $disables_class = $is_disabled ? 'disabled' : '';
+                ?>
+                <div class="box box<?php echo $i; ?> <?php echo $disables_class; ?>" data-slot="<?php echo $i; ?>">
+                    <div class="text">
+                        <h2 class="topic-heading">Slot <?php echo $i; ?></h2>
+                        <?php if (isset($reservations[$i])): ?>
+                            <h2 class="topic selected-slot">Plate Number: <?php echo htmlspecialchars($reservations[$i]['plate_number']); ?></h2>
+                            <?php if ($reservations[$i]['plate_number'] == $_SESSION['selected_plate_number']): ?>
+                                <?php if ($reservations[$i]['status'] == 'occupied'): ?>
+                                    <h2 class="topic selected-slot">Status: Occupied</h2>
+                                <?php else: ?>
+                                    <?php if ($show_timer): ?>
+                                        <h2 class="topic selected-slot"><span class="timer" data-expiry="<?php echo 300; ?>"></span></h2>
+                                    <?php else: ?>
+                                        <?php if ($show_vehicle_type): ?>
+                                            <h2 class="topic selected-slot">Vehicle type: <?php echo htmlspecialchars($vehicle['vehicle_type']); ?></h2>
+                                            <?php if ($user_role === 'president' || $user_role === 'vice_president'): ?>
+                                                <button class="cancel-btn" data-slot="<?php echo $i; ?>">X</button>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <h2 class="topic selected-slot"></h2>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <h2 class="topic selected-slot">Status: <?php echo htmlspecialchars($reservations[$i]['status']); ?></h2>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <h2 class="topic">Status: Available</h2>
                         <?php endif; ?>
-                    <?php endif; ?>
+                    </div>
+                    <i class="fas fa-car <?php echo isset($reservations[$i]) ? ($reservations[$i]['status'] == 'occupied' ? 'occupied' : 'reserved') : 'available'; ?>" alt="car"></i>
                 </div>
-                <i class="fas fa-car" id="car-icon-<?php echo $i; ?>"></i>
-            </div>
             <?php endfor; ?>
         </div>
     </div>
@@ -133,7 +143,7 @@ body {
             <button id="confirmBtn">Confirm</button>
             <button id="cancelBtn">Cancel</button>
         </div>
-    </div>
+    </div> 
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -143,29 +153,10 @@ body {
             var cancelBtn = document.getElementById("cancelBtn");
             var selectedSlot = null;
 
-            // Fetch slot statuses every 3 seconds
-            function fetchSlotStatuses() {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "get_slots_status.php", true);
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        var statuses = JSON.parse(xhr.responseText);
-                        statuses.forEach(function (slot) {
-                            var statusText = document.getElementById("status-" + slot.slot_number);
-                            var carIcon = document.getElementById("car-icon-" + slot.slot_number);
-                            statusText.textContent = slot.status.charAt(0).toUpperCase() + slot.status.slice(1); // Capitalize status
-                            carIcon.className = slot.status === 'occupied' ? 'fas fa-car occupied' : 'fas fa-car available';
-                        });
-                    }
-                };
-                xhr.send();
-            }
-
-            // Call fetchSlotStatuses every 3 seconds
-            setInterval(fetchSlotStatuses, 3000);
-
             document.querySelectorAll('.box').forEach(function (box) {
                 box.addEventListener('click', function () {
+                    document.querySelectorAll('.box').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
                     selectedSlot = this.getAttribute('data-slot');
                     document.getElementById("modalText").innerText = "You want to reserve this slot #" + selectedSlot + "?";
                     modal.style.display = "block";
@@ -186,8 +177,10 @@ body {
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
-                        alert(xhr.responseText);
+                        var responseText = xhr.responseText;
+                        alert(responseText);
                         modal.style.display = "none";
+                        location.reload(); // This will trigger the polling again
                     }
                 };
                 xhr.send("slot_number=" + selectedSlot + "&plate_number=" + encodeURIComponent("<?php echo $plate_number; ?>"));
@@ -201,7 +194,7 @@ body {
 
             document.querySelectorAll('.cancel-btn').forEach(function (button) {
                 button.addEventListener('click', function (event) {
-                    event.stopPropagation();
+                    event.stopPropagation(); 
                     var slot = this.getAttribute('data-slot');
                     if (confirm("Are you sure you want to cancel the reservation for slot #" + slot + "?")) {
                         var xhr = new XMLHttpRequest();
@@ -210,14 +203,59 @@ body {
                         xhr.onreadystatechange = function () {
                             if (xhr.readyState === 4 && xhr.status === 200) {
                                 alert("Reservation for slot #" + slot + " has been canceled.");
-                                location.reload();
+                                location.reload(); // This will trigger the polling again
                             }
                         };
                         xhr.send("slot_number=" + slot);
                     }
                 });
             });
+
+            // Start polling every 5 seconds
+            setInterval(fetchParkingStatus, 1000);
         });
+
+        function fetchParkingStatus() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "get_parking_status.php", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var slots = JSON.parse(xhr.responseText);
+                    updateSlotStatuses(slots);
+                }
+            };
+            xhr.send();
+        }
+
+        function updateSlotStatuses(slots) {
+            for (var slotNumber in slots) {
+                var slotInfo = slots[slotNumber];
+                var box = document.querySelector('.box[data-slot="' + slotNumber + '"]');
+                if (box) {
+                    // Update plate number if exists
+                    var plateNumberElem = box.querySelector('.selected-slot');
+                    if (slotInfo.plate_number) {
+                        plateNumberElem.innerHTML = 'Plate Number: ' + slotInfo.plate_number;
+                    } else {
+                        plateNumberElem.innerHTML = '';
+                    }
+
+                    // Update status
+                    var statusElem = box.querySelector('.topic.selected-slot:last-of-type');
+                    statusElem.innerHTML = 'Status: ' + slotInfo.status.charAt(0).toUpperCase() + slotInfo.status.slice(1);
+                    var carIcon = box.querySelector('.fa-car');
+                    
+                    // Change icon class based on status
+                    if (slotInfo.status === 'occupied') {
+                        carIcon.className = 'fas fa-car occupied';
+                    } else if (slotInfo.status === 'reserved') {
+                        carIcon.className = 'fas fa-car reserved';
+                    } else {
+                        carIcon.className = 'fas fa-car available';
+                    }
+                }
+            }
+        }
     </script>
 </body>
 </html>

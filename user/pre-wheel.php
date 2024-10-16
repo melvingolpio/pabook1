@@ -96,7 +96,7 @@ $show_vehicle_type = ($user_role === 'president' || $user_role === 'vice_preside
             </a>
         </div>
         <div class="box-container">
-            <?php for ($i = 1; $i <= 25; $i++): ?>
+            <?php for ($i = 1; $i <= 2; $i++): ?>
                 <?php 
                 $is_disabled = isset($reservations[$i]) && in_array($reservations[$i]['status'], ['reserved', 'occupied']);
                 $disables_class = $is_disabled ? 'disabled' : '';

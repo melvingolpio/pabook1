@@ -1,0 +1,17 @@
+
+<?php 
+require('../dbconn.php');
+
+$hashed_password = password_hash('999', PASSWORD_DEFAULT);
+
+$update_sql = "UPDATE users SET password = ? WHERE type = 'Admin'";
+$stmt = $conn->prepare($update_sql);
+$stmt->bind_param('s', $hashed_password);
+if ($stmt->execute()) {
+    echo "Admin password updated successfully.";
+} else {
+    echo "Error updating password: " . $conn->error;
+}
+
+?>
+

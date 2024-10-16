@@ -1,0 +1,281 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+    color: inherit;
+  
+  }
+  :root {
+    --background-color1: #1a74e2;
+    --background-color2: #ffffff;
+    --background-color3: #ededed;
+    --background-color4: #f5f5f5;
+    --primary-color: #4b49ac;
+    --secondary-color: #0c007d;
+}
+  body {
+    background-color: var(--background-color4);
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  header {
+    height: 70px;
+    width: 100vw;
+    padding: 0 30px;
+    background-color: var(--background-color1);
+    position: fixed;
+    z-index: 100;
+    box-shadow: 1px 1px 15px rgba(161, 182, 253, 0.825);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .name {
+    margin-left: 10px;
+    padding-top: 10px;
+  }
+  
+  .logo {
+    font-size: 27px;
+    font-weight: 600;
+    color: rgb(23, 41, 128);
+  }
+  
+  .icn {
+    height: 20px;
+  }
+  .menuicn {
+    cursor: pointer;
+  }
+  
+  .picture,
+  .logosec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .logosec {
+    gap: 60px;
+  }
+  
+  
+  .message {
+    gap: 40px;
+    position: relative;
+    cursor: pointer;
+  }
+  .dp {
+    height: 40px;
+    width: 40px;
+    background-color: #626262;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .main-container {
+    display: flex;
+    width: 100vw;
+    position: relative;
+    top: 70px;
+    z-index: 1;
+  }
+  .dpicn {
+    height: 42px
+  }
+  
+  .main {
+  display: grid;
+  place-items: center;
+  height: calc(100vh - 70px);
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 40px 30px 30px 30px;
+  }
+  
+  .main::-webkit-scrollbar-thumb {
+    background-image: 
+          linear-gradient(to bottom, rgb(0, 0, 85), rgb(0, 0, 50));
+  }
+  .main::-webkit-scrollbar {
+    width: 5px;
+  }
+  .main::-webkit-scrollbar-track {
+    background-color: #9e9e9eb2;
+  }
+  
+  .box-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 50px;
+  }
+  
+  .nav {
+    min-height: 91vh;
+    width: 250px;
+    background-color: var(--background-color2);
+    position: absolute;
+    top: 0px;
+    left: 00;
+    box-shadow: 1px 1px 10px rgba(198, 189, 248, 0.825);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 30px 0 20px 10px;
+  
+  }
+  .navcontainer {
+    height: calc(100vh - 70px);
+    width: 250px;
+    position: relative;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    transition: all 0.5s ease-in-out;
+  
+  }
+  .navcontainer::-webkit-scrollbar {
+    display: none;
+  }
+  .navclose {
+    width: 80px;
+  }
+  
+  .nav-option {
+    width: 250px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    padding: 0 30px 0 20px;
+    gap: 20px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .nav-option:hover,
+  .nav-option.active {
+    transform: translateY(-2px);
+      background-color: #3498db;
+      color: white;
+  }
+  
+  .nav-img {
+    height: 22px;
+  }
+  
+  .nav-upper-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;  
+  }
+  
+  
+  
+  .signup-container {
+  background-color: #fff;
+  padding: 40px 40px;
+  border-radius: 8px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  
+  }
+  
+  .signup-container h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+  
+  }
+  
+  .signup-container form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  
+  }
+  
+  .signup-container label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+  
+  }
+  
+  .signup-container input,
+  .signup-container select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  
+  }
+  
+  .button-container {
+  display: flex;
+  gap: 130%; 
+  }
+  
+  
+  .cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: red;
+  color: white;
+  }
+  
+  .cancel-button:hover {
+  background-color: darkred;
+  }
+  
+  .submit-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: #4cae4c;
+  color: white;
+  }
+  
+  .submit-button:hover {
+  background-color: green;
+  
+  }
+  .file-input {
+  display: none;
+  }
+  
+  .file-input-label {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 5px;
+  }
+  
+  .file-input-label:hover {
+  background-color: #0056b3;
+  }
+  
+  
+  
+  

@@ -1,0 +1,664 @@
+<?php 
+session_start();
+
+$shutdown_status = file_get_contents('../admin/shutdown_status.txt');
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS Homepage</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #1a74e2;
+            color: white;
+            padding: 16px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            margin: 0;
+        }
+
+        header nav ul li {
+            margin-right: 16px;
+        }
+
+        header nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        header nav ul li a:hover {
+            color: #f1f1f1;
+        }
+
+        .announcement {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #f5c6cb;
+            margin: 16px 0;
+            border-radius: 8px;
+        }
+
+        .slider {
+            display: flex;
+            overflow: hidden;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .<?php 
+session_start();
+
+$shutdown_status = file_get_contents('../admin/shutdown_status.txt');
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS Homepage</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #1a74e2;
+            color: white;
+            padding: 16px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            margin: 0;
+        }
+
+        header nav ul li {
+            margin-right: 16px;
+        }
+
+        header nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        header nav ul li a:hover {
+            color: #f1f1f1;
+        }
+
+        .announcement {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #f5c6cb;
+            margin: 16px 0;
+            border-radius: 8px;
+        }
+
+        .slider {
+            display: flex;
+            overflow: hidden;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            min-width: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .nav-buttons {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .nav-button {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #333;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-card {
+            background-color: #1a74e2;
+            color: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            width: 240px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-card:hover {
+            background-color: #155abf;
+            transform: translateY(-4px);
+        }
+
+        .card-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin: 0 auto 12px;
+            object-fit: cover;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 12px 0;
+        }
+
+        .card-role {
+            color: #e0e0e0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gray-600 {
+            color: #4a4a4a;
+        }
+
+        .text-gray-800 {
+            color: #333;
+        }
+
+        .bg-white {
+            background-color: #fff;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="py-4">
+        <div class="container mx-auto flex justify-between items-center px-6">
+            <h1 class="text-2xl font-bold text-white">PaBook</h1>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><button class="text-white hover:text-gray-200 nav-link" data-target="0">Home</button></li>
+                    <li><button class="text-white hover:text-gray-200 nav-link" data-target="1">About Us</button></li>
+                    <li><button class="text-white hover:text-gray-200 nav-link" data-target="2">Goal</button></li>
+                    <li><a href="index.php"><button class="text-white hover:text-gray-200 nav-link">Dashboard</button></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <?php if ($shutdown_status === '1') : ?>
+        <section class="announcement">
+            <p>Announcement: The website will be shut down for maintenance on [date/time]. Please save your work.</p>
+        </section>
+    <?php endif; ?>
+
+    <div class="slider">
+        <section id="home" class="slide bg-white flex items-center justify-center">
+            <div class="text-center px-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Welcome to Our Parking Management System</h2>
+                <p class="text-gray-600 mb-8">Manage your parking needs efficiently with our state-of-the-art system. Book, manage, and pay for parking slots seamlessly.</p>
+                <div class="flex justify-center gap-6">
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-2">Easy Reservations</h3>
+                        <p class="text-gray-600">Book parking slots in just a few clicks.</p>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-2">Real-time Availability</h3>
+                        <p class="text-gray-600">Check slot availability in real-time.</p>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-2">Secure Payments</h3>
+                        <p class="text-gray-600">Make payments securely online.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about-us" class="slide bg-white flex items-center justify-center py-12">
+            <div class="text-center px-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">About Us</h2>
+                <p class="text-gray-600 mb-8">Our team is dedicated to revolutionizing parking management. With years of experience in technology and a passion for innovation, we strive to provide the best solutions for all your parking needs. Meet our talented team who make it all possible.</p>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 1" class="card-img">
+                        <h3 class="card-title">John Doe</h3>
+                        <p class="card-role">Lead Developer</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 2" class="card-img">
+                        <h3 class="card-title">Jane Smith</h3>
+                        <p class="card-role">Project Manager</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 3" class="card-img">
+                        <h3 class="card-title">Michael Johnson</h3>
+                        <p class="card-role">UI/UX Designer</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 4" class="card-img">
+                        <h3 class="card-title">Emily Davis</h3>
+                        <p class="card-role">Marketing Specialist</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 5" class="card-img">
+                        <h3 class="card-title">David Wilson</h3>
+                        <p class="card-role">Backend Developer</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 6" class="card-img">
+                        <h3 class="card-title">Sophia Lee</h3>
+                        <p class="card-role">Customer Support</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="goal" class="slide bg-white flex items-center justify-center py-12">
+            <div class="text-center px-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Our Goal</h2>
+                <p class="text-gray-600 mb-8">Our primary goal is to simplify parking management for everyone. We aim to provide a user-friendly system that enhances convenience, efficiency, and security. By leveraging advanced technology, we strive to offer a seamless experience from reservation to payment, ensuring a hassle-free parking solution for all users.</p>
+                <div class="flex flex-col items-center">
+                    <div class="bg-green-100 p-6 rounded-lg shadow-lg mb-4 w-full max-w-lg">
+                        <h3 class="text-xl font-semibold mb-2">Customer Satisfaction</h3>
+                        <p class="text-gray-600">We are committed to delivering exceptional service and support to all our customers.</p>
+                    </div>
+                    <div class="bg-green-100 p-6 rounded-lg shadow-lg w-full max-w-lg">
+                        <h3 class="text-xl font-semibold mb-2">Innovative Solutions</h3>
+                        <p class="text-gray-600">Our team is dedicated to continuous improvement and innovation to meet evolving needs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-button" id="prev">&lt;</button>
+        <button class="nav-button" id="next">&gt;</button>
+    </div>
+
+    <footer class="bg-white py-4">
+        <div class="container mx-auto text-center text-gray-600">
+            <p>&copy; 2024 PMS. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const navLinks = document.querySelectorAll('.nav-link');
+        let currentIndex = 0;
+
+        document.getElementById('next').addEventListener('click', () => {
+            if (currentIndex < slides.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateSlider();
+        });
+
+        document.getElementById('prev').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = slides.length - 1;
+            }
+            updateSlider();
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                currentIndex = parseInt(e.target.getAttribute('data-target'));
+                updateSlider();
+            });
+        });
+
+        function updateSlider() {
+            const offset = -currentIndex * 100;
+            slides.forEach(slide => {
+                slide.style.transform = `translateX(${offset}%)`;
+            });
+        }
+    </script>
+
+</body>
+
+</html>
+ {
+            min-width: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .nav-buttons {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+
+        .nav-button {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #333;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-card {
+            background-color: #1a74e2;
+            color: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            width: 240px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-card:hover {
+            background-color: #155abf;
+            transform: translateY(-4px);
+        }
+
+        .card-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin: 0 auto 12px;
+            object-fit: cover;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 12px 0;
+        }
+
+        .card-role {
+            color: #e0e0e0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gray-600 {
+            color: #4a4a4a;
+        }
+
+        .text-gray-800 {
+            color: #333;
+        }
+
+        .bg-white {
+            background-color: #fff;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="py-4">
+        <div class="container mx-auto flex justify-between items-center px-6">
+            <h1 class="text-2xl font-bold text-white">PaBook</h1>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><button class="text-white hover:text-gray-200 nav-link" data-target="0">Home</button></li>
+                    <li><button class="text-white hover:text-gray-200 nav-link" data-target="1">About Us</button></li>
+                    <li><button class="text-white hover:text-gray-200 nav-link" data-target="2">Goal</button></li>
+                    <li><a href="index.php"><button class="text-white hover:text-gray-200 nav-link">Dashboard</button></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <?php if ($shutdown_status === '1') : ?>
+        <section class="announcement">
+            <p>Announcement: The website will be shut down for maintenance on [date/time]. Please save your work.</p>
+        </section>
+    <?php endif; ?>
+
+    <div class="slider">
+        <section id="home" class="slide bg-white flex items-center justify-center">
+            <div class="text-center px-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Welcome to Our Parking Management System</h2>
+                <p class="text-gray-600 mb-8">Manage your parking needs efficiently with our state-of-the-art system. Book, manage, and pay for parking slots seamlessly.</p>
+                <div class="flex justify-center gap-6">
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-2">Easy Reservations</h3>
+                        <p class="text-gray-600">Book parking slots in just a few clicks.</p>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-2">Real-time Availability</h3>
+                        <p class="text-gray-600">Check slot availability in real-time.</p>
+                    </div>
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-2">Secure Payments</h3>
+                        <p class="text-gray-600">Make payments securely online.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about-us" class="slide bg-white flex items-center justify-center py-12">
+            <div class="text-center px-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">About Us</h2>
+                <p class="text-gray-600 mb-8">Our team is dedicated to revolutionizing parking management. With years of experience in technology and a passion for innovation, we strive to provide the best solutions for all your parking needs. Meet our talented team who make it all possible.</p>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 1" class="card-img">
+                        <h3 class="card-title">John Doe</h3>
+                        <p class="card-role">Lead Developer</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 2" class="card-img">
+                        <h3 class="card-title">Jane Smith</h3>
+                        <p class="card-role">Project Manager</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 3" class="card-img">
+                        <h3 class="card-title">Michael Johnson</h3>
+                        <p class="card-role">UI/UX Designer</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 4" class="card-img">
+                        <h3 class="card-title">Emily Davis</h3>
+                        <p class="card-role">Marketing Specialist</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 5" class="card-img">
+                        <h3 class="card-title">David Wilson</h3>
+                        <p class="card-role">Backend Developer</p>
+                    </div>
+                    <div class="btn-card">
+                        <img src="../img/cancer.jpg" alt="Team Member 6" class="card-img">
+                        <h3 class="card-title">Sophia Lee</h3>
+                        <p class="card-role">Customer Support</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="goal" class="slide bg-white flex items-center justify-center py-12">
+            <div class="text-center px-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Our Goal</h2>
+                <p class="text-gray-600 mb-8">Our primary goal is to simplify parking management for everyone. We aim to provide a user-friendly system that enhances convenience, efficiency, and security. By leveraging advanced technology, we strive to offer a seamless experience from reservation to payment, ensuring a hassle-free parking solution for all users.</p>
+                <div class="flex flex-col items-center">
+                    <div class="bg-green-100 p-6 rounded-lg shadow-lg mb-4 w-full max-w-lg">
+                        <h3 class="text-xl font-semibold mb-2">Customer Satisfaction</h3>
+                        <p class="text-gray-600">We are committed to delivering exceptional service and support to all our customers.</p>
+                    </div>
+                    <div class="bg-green-100 p-6 rounded-lg shadow-lg w-full max-w-lg">
+                        <h3 class="text-xl font-semibold mb-2">Innovative Solutions</h3>
+                        <p class="text-gray-600">Our team is dedicated to continuous improvement and innovation to meet evolving needs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-button" id="prev">&lt;</button>
+        <button class="nav-button" id="next">&gt;</button>
+    </div>
+
+    <footer class="bg-white py-4">
+        <div class="container mx-auto text-center text-gray-600">
+            <p>&copy; 2024 PMS. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const navLinks = document.querySelectorAll('.nav-link');
+        let currentIndex = 0;
+
+        document.getElementById('next').addEventListener('click', () => {
+            if (currentIndex < slides.length - 1) {
+                currentIndex++;
+            } else {
+                currentIndex = 0;
+            }
+            updateSlider();
+        });
+
+        document.getElementById('prev').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                currentIndex = slides.length - 1;
+            }
+            updateSlider();
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                currentIndex = parseInt(e.target.getAttribute('data-target'));
+                updateSlider();
+            });
+        });
+
+        function updateSlider() {
+            const offset = -currentIndex * 100;
+            slides.forEach(slide => {
+                slide.style.transform = `translateX(${offset}%)`;
+            });
+        }
+    </script>
+
+</body>
+
+</html>

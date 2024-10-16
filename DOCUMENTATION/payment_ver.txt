@@ -1,0 +1,9 @@
+(
+OPEN XAMPP - Click Apache Config - Click Php.ini - Search ;extension=gd - remove ' ; ' - save & close;
+REMOVE ';'
+
+;extension=gd (wrong)
+extension=gd (correct)
+
+
+)

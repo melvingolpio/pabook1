@@ -1,197 +1,261 @@
-<?php 
+<?php
 session_start();
-require('../dbconn.php');
+require('../dbconn.php'); 
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['slot_number'])) {
+if (!isset($_SESSION['username']) || $_SESSION['type'] != 'User') {
+    header("Location: ../index.php"); 
+    exit();
+}
 
-    if (!isset($_SESSION['username'])) {
-        echo "User not logged in.";
-        exit;
-    }
+$plate_number = $_SESSION['selected_plate_number'] ?? '';
 
-    $slot_number = $_POST['slot_number'];
-    $plate_number = $_POST['plate_number'];
-    $username_user = $_SESSION['username'];
+if (empty($plate_number)) {
+    echo "No vehicle selected.";
+    exit();
+}
 
-    // Prepare and execute the query to get user details
-    $sql_user = "SELECT id, role FROM users WHERE username = ?";
-    $stmt_user = $conn->prepare($sql_user);
-    $stmt_user->bind_param('s', $username_user);
-    $stmt_user->execute();
-    $result_user = $stmt_user->get_result();
+$query = "SELECT * FROM vehicle WHERE plate_number = ? AND (vehicle_type = '4_wheel' OR vehicle_type = '3_wheel' OR vehicle_type = '2_wheel')";
+$stmt = $conn->prepare($query);
+$stmt->bind_param('s', $plate_number);
+$stmt->execute();
+$result = $stmt->get_result();
+$vehicle = $result->fetch_assoc();
 
-    if ($result_user->num_rows > 0) {
-        $row_user = $result_user->fetch_assoc();
-        $user_id = $row_user['id'];
-        $user_role = $row_user['role'];
+if (!$vehicle) {
+    echo "Vehicle not found.";
+    exit();
+}
 
-        // Prepare and execute the query to get vehicle type
-        $sql_vehicle_type = "SELECT vehicle_type FROM vehicle WHERE plate_number = ?";
-        $stmt_vehicle_type = $conn->prepare($sql_vehicle_type);
-        $stmt_vehicle_type->bind_param('s', $plate_number);
-        $stmt_vehicle_type->execute();
-        $result_vehicle_type = $stmt_vehicle_type->get_result();
-        $row_vehicle_type = $result_vehicle_type->fetch_assoc();
-        
-        if (!$row_vehicle_type) {
-            echo "Vehicle type not found.";
-            exit;
+$reservation_query = "SELECT * FROM parking_slots";
+$reservation_result = $conn->query($reservation_query);
+
+$reservations = [];
+while ($row = $reservation_result->fetch_assoc()) {
+    $reservations[$row['slot_id']] = array('status' => $row['status']);
+}
+
+$user_role = $_SESSION['role'];
+$show_timer = !($user_role === 'president' || $user_role === 'vice_president');
+$show_vehicle_type = ($user_role === 'president' || $user_role === 'vice_president');
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="assets/css/pree-wheel.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
+    <style>
+        .box {
+            position: relative;
         }
+        .cancel-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid #c0392b;
+        }
+        .cancel-btn:hover {
+            background-color: darkred;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .cancel-btn:active {
+            background-color: maroon;
+            transform: scale(0.95);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <h2>Vehicle Details</h2>
+        <p><strong>Plate Number:</strong> <?php echo htmlspecialchars($vehicle['plate_number']); ?></p>
+        <p><strong>Brand:</strong> <?php echo htmlspecialchars($vehicle['vehicle_brand']); ?></p>
+        <div class="arrow">
+            <a href="booking.php" class="nav-btn">
+                <i class="fas fa-arrow-left nav-img"></i>
+            </a>
+        </div>
+        <div class="box-container">
+            <?php for ($i = 1; $i <= 25; $i++): ?>
+                <?php 
+                $is_disabled = isset($reservations[$i]) && in_array($reservations[$i]['status'], ['reserved', 'occupied']);
+                $disables_class = $is_disabled ? 'disabled' : '';
+                ?>
+                <div class="box box<?php echo $i; ?> <?php echo $disables_class; ?>" data-slot="<?php echo $i; ?>">
+                    <div class="text">
+                        <h2 class="topic-heading">Slot <?php echo $i; ?></h2>
+                        <?php if (isset($reservations[$i])): ?>
+                            <h2 class="topic selected-slot">Plate Number: <?php echo htmlspecialchars($reservations[$i]['plate_number']); ?></h2>
+                            <?php if ($reservations[$i]['plate_number'] == $_SESSION['selected_plate_number']): ?>
+                                <?php if ($reservations[$i]['status'] == 'occupied'): ?>
+                                    <h2 class="topic selected-slot">Status: Occupied</h2>
+                                <?php else: ?>
+                                    <?php if ($show_timer): ?>
+                                        <h2 class="topic selected-slot"><span class="timer" data-expiry="<?php echo 300; ?>"></span></h2>
+                                    <?php else: ?>
+                                        <?php if ($show_vehicle_type): ?>
+                                            <h2 class="topic selected-slot">Vehicle type: <?php echo htmlspecialchars($vehicle['vehicle_type']); ?></h2>
+                                            <?php if ($user_role === 'president' || $user_role === 'vice_president'): ?>
+                                                <button class="cancel-btn" data-slot="<?php echo $i; ?>">X</button>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <h2 class="topic selected-slot"></h2>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <h2 class="topic selected-slot">Status: <?php echo htmlspecialchars($reservations[$i]['status']); ?></h2>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <h2 class="topic">Status: Available</h2>
+                        <?php endif; ?>
+                    </div>
+                    <i class="fas fa-car <?php echo isset($reservations[$i]) ? ($reservations[$i]['status'] == 'occupied' ? 'occupied' : 'reserved') : 'available'; ?>" alt="car"></i>
+                </div>
+            <?php endfor; ?>
+        </div>
+    </div>
 
-        $vehicle_type = $row_vehicle_type['vehicle_type'];
+    <div id="confirmationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalText">You want to reserve this slot #?</p>
+            <button id="confirmBtn">Confirm</button>
+            <button id="cancelBtn">Cancel</button>
+        </div>
+    </div> 
 
-        // Check if user already has a reservation for the vehicle type
-        $sql_check_vehicle_type = "SELECT id FROM reservations WHERE user_id = ? AND vehicle_type = ? AND status IN ('reserved', 'occupied')";
-        $stmt_check_vehicle_type = $conn->prepare($sql_check_vehicle_type);
-        $stmt_check_vehicle_type->bind_param('is', $user_id, $vehicle_type);
-        $stmt_check_vehicle_type->execute();
-        $result_check_vehicle_type = $stmt_check_vehicle_type->get_result();
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var modal = document.getElementById("confirmationModal");
+            var span = document.getElementsByClassName("close")[0];
+            var confirmBtn = document.getElementById("confirmBtn");
+            var cancelBtn = document.getElementById("cancelBtn");
+            var selectedSlot = null;
 
-        if ($result_check_vehicle_type->num_rows > 0) {
-            echo "You already have a reservation for a vehicle of this type.";
-        } else {
+            document.querySelectorAll('.box').forEach(function (box) {
+                box.addEventListener('click', function () {
+                    document.querySelectorAll('.box').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedSlot = this.getAttribute('data-slot');
+                    document.getElementById("modalText").innerText = "You want to reserve this slot #" + selectedSlot + "?";
+                    modal.style.display = "block";
+                });
+            });
 
-            // Check if the plate number is already reserved
-            $sql_check_plate = "SELECT r.id, a.id
-                                FROM reservations r
-                                JOIN activities a ON r.plate_number = a.plate_number
-                                WHERE r.plate_number = ? AND (r.status = 'reserved' OR a.status = 'occupied')";
-            $stmt_check_plate = $conn->prepare($sql_check_plate);
-            $stmt_check_plate->bind_param('s', $plate_number);
-            $stmt_check_plate->execute();
-            $result_check_plate = $stmt_check_plate->get_result();
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
 
-            if ($result_check_plate->num_rows > 0) {
-                echo "The plate number is already reserved.";
-            } else {
+            cancelBtn.onclick = function () {
+                modal.style.display = "none";
+            }
 
-                // Check if the slot is already reserved
-                $sql_check_slot = "SELECT id, expiry_time, slot_id FROM reservations WHERE slot_number = ? AND status = 'reserved'";
-                $stmt_check_slot = $conn->prepare($sql_check_slot);
-                $stmt_check_slot->bind_param('i', $slot_number);
-                $stmt_check_slot->execute();
-                $result_check_slot = $stmt_check_slot->get_result();
-
-                if ($result_check_slot->num_rows > 0) {
-                    $row_slot = $result_check_slot->fetch_assoc();
-                    $slot_id = $row_slot['slot_id'] ?? $slot_number;
-
-                    // Update the reservation status to occupied
-                    $sql_update = "UPDATE reservations SET status = 'occupied', slot_number = NULL, slot_id = ? WHERE slot_number = ? AND status = 'reserved'";
-                    $stmt_update = $conn->prepare($sql_update);
-                    $stmt_update->bind_param('ii', $slot_id, $slot_number);
-
-                    if ($stmt_update->execute()) {
-                        // Update the parking_slots table status to 'occupied'
-                        $sql_update_slot = "UPDATE parking_slots SET status = 'occupied' WHERE slot_id = ?";
-                        $stmt_update_slot = $conn->prepare($sql_update_slot);
-                        $stmt_update_slot->bind_param('i', $slot_id);
-
-                        if ($stmt_update_slot->execute()) {
-                            echo "Slot #$slot_number status updated to occupied and slot number cleared.";
-                        } else {
-                            echo "Error updating parking slot status: " . htmlspecialchars($stmt_update_slot->error);
-                        }
-
-                        $stmt_update_slot->close();
-                    } else {
-                        echo "Error: " . htmlspecialchars($stmt_update->error);
+            confirmBtn.onclick = function () {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "reserve_slot.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var responseText = xhr.responseText;
+                        alert(responseText);
+                        modal.style.display = "none";
+                        location.reload(); // This will trigger the polling again
                     }
+                };
+                xhr.send("slot_number=" + selectedSlot + "&plate_number=" + encodeURIComponent("<?php echo $plate_number; ?>"));
+            }
 
-                    $stmt_update->close();
-
-                } else {
-                    $reservation_time = date('Y-m-d H:i:s');
-                    if ($user_role == 'president' || $user_role == 'vice') {
-                        $expiry_time = '9999-12-31 23:59:59'; 
-                    } else {
-                        $expiry_time = date('Y-m-d H:i:s', strtotime($reservation_time . ' +5 minutes'));
-                    }
-
-                    // Insert a new reservation
-                    $sql_insert = "INSERT INTO reservations (user_id, plate_number, vehicle_type, slot_number, slot_id, status, reservation_date, expiry_time) 
-                                   VALUES (?, ?, ?, ?, ?, 'reserved', ?, ?)";
-                    $stmt_insert = $conn->prepare($sql_insert);
-                    $stmt_insert->bind_param('issiiss', $user_id, $plate_number, $vehicle_type, $slot_number, $slot_number, $reservation_time, $expiry_time);
-
-                    if ($stmt_insert->execute()) {
-                        // Update the parking_slots table status to 'reserved'
-                        $sql_update_slot = "UPDATE parking_slots SET status = 'reserved' WHERE slot_id = ?";
-                        $stmt_update_slot = $conn->prepare($sql_update_slot);
-                        $stmt_update_slot->bind_param('i', $slot_number);
-
-                        if ($stmt_update_slot->execute()) {
-                            echo "Reservation made successfully. Slot #$slot_number is now reserved.";
-                        } else {
-                            echo "Error updating parking slot status to reserved: " . htmlspecialchars($stmt_update_slot->error);
-                        }
-
-                        $stmt_update_slot->close();
-                        exit();
-                    } else {
-                        header("Location: reserve_slot.php?error=" . urldecode("Error inserting reservation: " . htmlspecialchars($stmt_insert->error)));
-                        exit();
-                    }
-
-                    $stmt_insert->close();
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
                 }
             }
 
-            $stmt_check_plate->close();
+            document.querySelectorAll('.cancel-btn').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.stopPropagation(); 
+                    var slot = this.getAttribute('data-slot');
+                    if (confirm("Are you sure you want to cancel the reservation for slot #" + slot + "?")) {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open("POST", "cancel_reservation.php", true);
+                        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                alert("Reservation for slot #" + slot + " has been canceled.");
+                                location.reload(); // This will trigger the polling again
+                            }
+                        };
+                        xhr.send("slot_number=" + slot);
+                    }
+                });
+            });
+
+            // Start polling every 5 seconds
+            setInterval(fetchParkingStatus, 1000);
+        });
+
+        function fetchParkingStatus() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "get_parking_status.php", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var slots = JSON.parse(xhr.responseText);
+                    updateSlotStatuses(slots);
+                }
+            };
+            xhr.send();
         }
 
-        $stmt_check_vehicle_type->close();
-    } else {
-        echo "User not found.";
-    }
+        function updateSlotStatuses(slots) {
+            for (var slotNumber in slots) {
+                var slotInfo = slots[slotNumber];
+                var box = document.querySelector('.box[data-slot="' + slotNumber + '"]');
+                if (box) {
+                    // Update plate number if exists
+                    var plateNumberElem = box.querySelector('.selected-slot');
+                    if (slotInfo.plate_number) {
+                        plateNumberElem.innerHTML = 'Plate Number: ' + slotInfo.plate_number;
+                    } else {
+                        plateNumberElem.innerHTML = '';
+                    }
 
-    $stmt_user->close();
-    $conn->close();
-} elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['check_expiry'])) {
-
-    $slot_number = $_POST['check_expiry'];
-
-    $sql_check_expiry = "SELECT id, expiry_time, user_id, slot_id FROM reservations WHERE slot_number = ? AND status = 'reserved'";
-    $stmt_check_expiry = $conn->prepare($sql_check_expiry);
-    $stmt_check_expiry->bind_param('i', $slot_number);
-    $stmt_check_expiry->execute();
-    $result_check_expiry = $stmt_check_expiry->get_result();
-
-    if ($result_check_expiry->num_rows > 0) {
-        $row = $result_check_expiry->fetch_assoc();
-        $expiry_time = new DateTime($row['expiry_time']);
-        $now = new DateTime();
-
-        if ($expiry_time < $now && !in_array($user_role, ['president', 'vice'])) {
-            // Update status to expired and clear the slot
-            $sql_update = "UPDATE reservations SET status = 'expired', expiry_time = '0000-00-00 00:00:00' WHERE slot_number = ? AND status = 'reserved'";
-            $stmt_update = $conn->prepare($sql_update);
-            $stmt_update->bind_param('i', $slot_number);
-
-            if ($stmt_update->execute()) {
-                // Update the parking_slots table to available
-                $sql_remove_slot = "UPDATE parking_slots SET status = 'available' WHERE slot_id = ?";
-                $stmt_remove_slot = $conn->prepare($sql_remove_slot);
-                $stmt_remove_slot->bind_param('i', $slot_number);
-                $stmt_remove_slot->execute();
-
-                echo "Reservation status updated to expired and slot number cleared.";
-            } else {
-                echo "Error: " . htmlspecialchars($stmt_update->error);
+                    // Update status
+                    var statusElem = box.querySelector('.topic.selected-slot:last-of-type');
+                    statusElem.innerHTML = 'Status: ' + slotInfo.status.charAt(0).toUpperCase() + slotInfo.status.slice(1);
+                    var carIcon = box.querySelector('.fa-car');
+                    
+                    // Change icon class based on status
+                    if (slotInfo.status === 'occupied') {
+                        carIcon.className = 'fas fa-car occupied';
+                    } else if (slotInfo.status === 'reserved') {
+                        carIcon.className = 'fas fa-car reserved';
+                    } else {
+                        carIcon.className = 'fas fa-car available';
+                    }
+                }
             }
-
-            $stmt_update->close();
-            $stmt_remove_slot->close();
-        } else {
-            echo "Reservation not yet expired.";
         }
-    } else {
-        echo "No reservation found.";
-    }
-
-    $stmt_check_expiry->close();
-    $conn->close();
-} else {
-    echo "Invalid request.";
-}
-?>
+    </script>
+</body>
+</html>

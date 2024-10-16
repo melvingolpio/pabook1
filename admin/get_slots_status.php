@@ -1,9 +1,9 @@
 <?php
 
-$host = "localhost";
-$username = "root";
-$password = ""; 
-$dbname = "pms"; 
+$host = "us-cluster-east-01.k8s.cleardb.net";
+$username = "b5f6a402460fa3";
+$password = "83f06a6b"; 
+$dbname = "heroku_706906bb621a740"; 
 
 
 $conn = new mysqli($host, $username, $password, $dbname);
@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 
-$sql = "SELECT status FROM parking_slots ORDER BY slot_number ASC";
+$sql = "SELECT status FROM parking_slots ORDER BY slot_id ASC";
 $result = $conn->query($sql);
 
 

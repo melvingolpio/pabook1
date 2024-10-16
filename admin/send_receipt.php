@@ -10,7 +10,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 if ($_SESSION['type'] != 'Admin') {
-    header("Location: ../login.php");
+    header("Location: ../index.php");
     exit();
 }
 

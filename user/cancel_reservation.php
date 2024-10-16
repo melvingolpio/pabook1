@@ -26,10 +26,21 @@ if (isset($_POST['slot_number'])) {
         $stmt_delete->bind_param('i', $slot_number);
 
         if ($stmt_delete->execute()) {
-            echo "Reservation for slot #$slot_number has been successfully removed.";
+            // If the reservation is successfully deleted, update the parking_slots table
+            $update_query = "UPDATE parking_slots SET status = 'available' WHERE slot_id = ?";
+            $stmt_update = $conn->prepare($update_query);
+            $stmt_update->bind_param('i', $slot_number);
+
+            if ($stmt_update->execute()) {
+                echo "Reservation for slot #$slot_number has been successfully removed and slot status updated to available.";
+            } else {
+                echo "Error updating slot status to available.";
+            }
+            $stmt_update->close();
         } else {
             echo "Error removing the reservation.";
         }
+        $stmt_delete->close();
     } else {
         echo "No reservation found for the given slot number.";
     }

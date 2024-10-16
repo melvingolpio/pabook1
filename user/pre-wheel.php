@@ -155,86 +155,118 @@ body {
             </div>
         </div> 
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var modal = document.getElementById("confirmationModal");
-                var span = document.getElementsByClassName("close")[0];
-                var confirmBtn = document.getElementById("confirmBtn");
-                var cancelBtn = document.getElementById("cancelBtn");
-                var selectedSlot = null;
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var modal = document.getElementById("confirmationModal");
+            var span = document.getElementsByClassName("close")[0];
+            var confirmBtn = document.getElementById("confirmBtn");
+            var cancelBtn = document.getElementById("cancelBtn");
+            var selectedSlot = null;
 
-                document.querySelectorAll('.box').forEach(function (box) {
-                    if (!box.classList.contains('disabled')) { 
-                        box.addEventListener('click', function () {
-                            selectedSlot = this.getAttribute('data-slot');
-                            document.getElementById("modalText").innerText = "You want to reserve this slot #" + selectedSlot + "?";
-                            modal.style.display = "block";
-                        });
-                    }
-                });
-
-                span.onclick = function () {
-                    modal.style.display = "none";
-                }
-
-                cancelBtn.onclick = function () {
-                    modal.style.display = "none";
-                }
-
-                confirmBtn.onclick = function () {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("POST", "reserve_slot.php", true);
-                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                    xhr.onreadystatechange = function () {
-                        if (xhr.readyState === 4 && xhr.status === 200) {
-                            var responseText = xhr.responseText;
-                            alert(responseText);
-                            modal.style.display = "none";
-
-                            let box = document.querySelector('.box' + selectedSlot);
-                            box.querySelector('.topic-heading').nextElementSibling.innerHTML = 'Status: Loading';
-                            let timer = document.querySelector('.timer');
-                            if (timer) {
-                                timer.setAttribute('data-expiry', 300);
-                            }
-                            box.querySelector('.fa-car').classList.add('occupied'); 
-                            
-                            setTimeout(() =>{
-                                location.reload();
-                            }, 1000);
-                        }
-                    };
-                    xhr.send("slot_number=" + selectedSlot + "&plate_number=" + encodeURIComponent("<?php echo $plate_number; ?>"));
-                }
-
-                window.onclick = function (event) {
-                    if (event.target == modal) {
-                        modal.style.display = "none";
-                    }
-                }
-
-                document.querySelectorAll('.cancel-btn').forEach(function (button) {
-                    button.addEventListener('click', function (event) {
-                        event.stopPropagation(); 
-                        var slot = this.getAttribute('data-slot');
-                        
-                        if (confirm("Are you sure you want to cancel the reservation for slot #" + slot + "?")) {
-                            var xhr = new XMLHttpRequest();
-                            xhr.open("POST", "cancel_reservation.php", true);
-                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                            xhr.onreadystatechange = function () {
-                                if (xhr.readyState === 4 && xhr.status === 200) {
-                                    alert("Reservation for slot #" + slot + " has been canceled.");
-                                    location.reload();
-                                }
-                            };
-                            xhr.send("slot_number=" + slot);
-                        }
-                    });
+            document.querySelectorAll('.box').forEach(function (box) {
+                box.addEventListener('click', function () {
+                    document.querySelectorAll('.box').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedSlot = this.getAttribute('data-slot');
+                    document.getElementById("modalText").innerText = "You want to reserve this slot #" + selectedSlot + "?";
+                    modal.style.display = "block";
                 });
             });
 
-        </script>
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+
+            cancelBtn.onclick = function () {
+                modal.style.display = "none";
+            }
+
+            confirmBtn.onclick = function () {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "reserve_slot.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var responseText = xhr.responseText;
+                        alert(responseText);
+                        modal.style.display = "none";
+                        location.reload(); // This will trigger the polling again
+                    }
+                };
+                xhr.send("slot_number=" + selectedSlot + "&plate_number=" + encodeURIComponent("<?php echo $plate_number; ?>"));
+            }
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            document.querySelectorAll('.cancel-btn').forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    event.stopPropagation(); 
+                    var slot = this.getAttribute('data-slot');
+                    if (confirm("Are you sure you want to cancel the reservation for slot #" + slot + "?")) {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open("POST", "cancel_reservation.php", true);
+                        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                alert("Reservation for slot #" + slot + " has been canceled.");
+                                location.reload(); // This will trigger the polling again
+                            }
+                        };
+                        xhr.send("slot_number=" + slot);
+                    }
+                });
+            });
+
+            // Start polling every 5 seconds
+            setInterval(fetchParkingStatus, 1000);
+        });
+
+        function fetchParkingStatus() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "get_parking_status.php", true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var slots = JSON.parse(xhr.responseText);
+                    updateSlotStatuses(slots);
+                }
+            };
+            xhr.send();
+        }
+
+        function updateSlotStatuses(slots) {
+            for (var slotNumber in slots) {
+                var slotInfo = slots[slotNumber];
+                var box = document.querySelector('.box[data-slot="' + slotNumber + '"]');
+                if (box) {
+                    // Update plate number if exists
+                    var plateNumberElem = box.querySelector('.selected-slot');
+                    if (slotInfo.plate_number) {
+                        plateNumberElem.innerHTML = 'Plate Number: ' + slotInfo.plate_number;
+                    } else {
+                        plateNumberElem.innerHTML = '';
+                    }
+
+                    // Update status
+                    var statusElem = box.querySelector('.topic.selected-slot:last-of-type');
+                    statusElem.innerHTML = 'Status: ' + slotInfo.status.charAt(0).toUpperCase() + slotInfo.status.slice(1);
+                    var carIcon = box.querySelector('.fa-car');
+                    
+                    // Change icon class based on status
+                    if (slotInfo.status === 'occupied') {
+                        carIcon.className = 'fas fa-car occupied';
+                    } else if (slotInfo.status === 'reserved') {
+                        carIcon.className = 'fas fa-car reserved';
+                    } else {
+                        carIcon.className = 'fas fa-car available';
+                    }
+                }
+            }
+        }
+    </script>
 
         <script src="assets/script/timer.js"></script>
         <script src="assets/script/index.js"></script>

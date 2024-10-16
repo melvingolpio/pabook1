@@ -3,7 +3,7 @@ session_start();
 require('../dbconn.php');
 
 // Fetch current status of all parking slots
-$query = "SELECT slot_id, status FROM parking_slots";
+$query = "SELECT slot_id, status FROM reservations";
 $result = $conn->query($query);
 
 $slots = [];

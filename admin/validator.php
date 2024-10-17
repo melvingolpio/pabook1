@@ -37,15 +37,29 @@ if (isset($_GET['code'])) {
         $stmt->execute();
         $result = $stmt->get_result();
 
-        // Log the query for debugging
-        error_log("Executed SQL Query: SELECT * FROM receipts WHERE receipt_token = '$receiptToken'");
-
         if ($result->num_rows > 0) {
-            // QR code found
-            echo json_encode(['status' => 'valid']);
+            // Receipt is valid, now check for reservation
+            $receipt = $result->fetch_assoc(); // Fetch receipt details
+            
+            // Check if the user has an active reservation
+            $userId = $receipt['user_id']; // Assuming receipt has a user_id field
+            $reservationStmt = $conn->prepare("SELECT * FROM reservations WHERE user_id = ? AND status = 'reserved'");
+            $reservationStmt->bind_param("i", $userId);
+            $reservationStmt->execute();
+            $reservationResult = $reservationStmt->get_result();
+
+            if ($reservationResult->num_rows > 0) {
+                // Reservation exists, allow access
+                echo json_encode(['status' => 'valid', 'message' => 'Access granted, reservation found.']);
+            } else {
+                // No active reservation
+                echo json_encode(['status' => 'no_reservation', 'message' => 'No active reservation found.']);
+            }
+
+            $reservationStmt->close();
         } else {
             // QR code not found
-            echo json_encode(['status' => 'invalid']);
+            echo json_encode(['status' => 'invalid', 'message' => 'Invalid QR code.']);
         }
 
         $stmt->close();

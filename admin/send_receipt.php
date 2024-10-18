@@ -18,10 +18,12 @@ function generateReceipt($userId, $plateNumber, $conn) {
     $uniqueToken = md5(uniqid($plateNumber, true));
     $expirationDate = date('Y-m-d H:i:s', strtotime('+1 year'));
     $createdAt = date('Y-m-d H:i:s');
-    $receiptUrl = "https://pabook-52f956d6314a.herokuapp.com/user/transaction.php?token=$uniqueToken";
+    $receiptUrl = "https://pabook-52f956d6314a.herokuapp.com/user/transaction.php?token=$uniqueToken"; // Corrected URL
 
     $qr_content = "Receipt Token: $uniqueToken\nCreated At: $createdAt";
     $qr_dir = 'qrcodes2/';
+    
+    // Check if the directory exists or create it
     if (!file_exists($qr_dir)) {
         mkdir($qr_dir, 0755, true);
     }
@@ -30,6 +32,7 @@ function generateReceipt($userId, $plateNumber, $conn) {
     QRcode::png($qr_content, $qr_file, QR_ECLEVEL_L, 10);
 
     if (!file_exists($qr_file)) {
+        error_log("QR code generation failed for plate number: $plateNumber");
         die("QR code generation failed.");
     }
 
@@ -39,6 +42,7 @@ function generateReceipt($userId, $plateNumber, $conn) {
     if ($stmt->execute()) {
         return true;
     } else {
+        error_log("Failed to insert/update receipt: " . $stmt->error);
         return false;
     }
 }
@@ -70,12 +74,12 @@ function sendReceiptEmail($userId, $plateNumber, $conn) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'pabookna@gmail.com';
-        $mail->Password   = 'tmab nwhu qlmp rczz';
+        $mail->Username   = getenv('SMTP_USERNAME'); // Use environment variable
+        $mail->Password   = getenv('SMTP_PASSWORD'); // Use environment variable
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        $mail->setFrom('pabookna@gmail.com', 'Pabook');
+        $mail->setFrom('mgolpio19@gmail.com', 'Pabook');
         $mail->addAddress($email);
 
         if (file_exists($qr_code_data)) {
@@ -92,6 +96,7 @@ function sendReceiptEmail($userId, $plateNumber, $conn) {
         $mail->send();
         return true;
     } catch (Exception $e) {
+        error_log("Failed to send email: " . $mail->ErrorInfo);
         return false;
     }
 }

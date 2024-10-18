@@ -10,7 +10,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 if ($_SESSION['type'] != 'Admin') {
-    header("Location: ../login.php");
+    header("Location: ../index.php");
     exit();
 }
 
@@ -18,7 +18,7 @@ function generateReceipt($userId, $plateNumber, $conn) {
     $uniqueToken = md5(uniqid($plateNumber, true));
     $expirationDate = date('Y-m-d H:i:s', strtotime('+1 year'));
     $createdAt = date('Y-m-d H:i:s');
-    $receiptUrl = "http://localhost/pms-sample/user/transaction.php?token=$uniqueToken";
+    $receiptUrl = "https://pabook-52f956d6314a.herokuapp.com/user/transaction.php?token=$uniqueToken";
 
     $qr_content = "Receipt Token: $uniqueToken\nCreated At: $createdAt";
     $qr_dir = 'qrcodes2/';

@@ -9,7 +9,7 @@ if ($shutdown !== '0'){
 }
 
 if ($_SESSION['type'] != 'User') {
-    header("Location: login.php"); 
+    header("Location: index.php"); 
     exit();
 } 
 
@@ -93,119 +93,86 @@ if ($row = $result->fetch_assoc()) {
 </head>
 
 <style>
-    .modal { 
-        display: none; 
-        position: fixed; 
-        z-index: 999; 
-        left: 0; 
-        top: 0; 
-        width: 100%; 
-        height: 100%; 
-        overflow: auto; 
-        background-color: rgba(0, 0, 0, 0.4); 
-    }
-    .modal-content { 
-        background-color: #fefefe; 
-        margin: 15% auto; 
-        padding: 20px; 
-        border: 1px solid #888; 
-        width: 80%; 
-    }
-    .close { 
-        color: #aaa; 
-        float: right; 
-        font-size: 28px; 
-        font-weight: bold; 
-    }
-    .close:hover, .close:focus { 
-        color: black; 
-        text-decoration: none; 
-        cursor: pointer; 
-    }
-    .modal-overlay { 
-        display: none; 
-        position: fixed; 
-        top: 0; 
-        left: 0; 
-        width: 100%; 
-        height: 100%; 
-        background: rgba(0, 0, 0, 0.5); 
-        z-index: 998; 
-    }
-    .center-message { 
-        display: none; 
-        position: fixed; 
-        top: 50%; 
-        left: 50%; 
-        transform: translate(-50%, -50%); 
-        background: #fff; 
-        padding: 20px; 
-        border-radius: 5px; 
-        z-index: 999; 
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-        text-align: center; 
-    }
-    .center-message.show, .modal-overlay.show { 
-        display: block; 
-    }
-    .success-message { 
-        background-color: #d4edda; 
-        color: #155724; 
-        border: 1px solid #c3e6cb; 
-        padding: 15px; 
-        border-radius: 5px; 
-        margin-bottom: 20px; 
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-        font-size: 16px; 
-        text-align: center; 
-    }
-    .error-message { 
-        background-color: #f8d7da; 
-        color: #721c24; 
-        border: 1px solid #f5c6cb; 
-        padding: 15px; 
-        border-radius: 5px; 
-        margin-bottom: 20px; 
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-        font-size: 16px; 
-        text-align: center; 
-    }
-    .logo {
-        font-variant: small-caps;
-        font-weight: bold;
-        color: white;
-        text-shadow: 2px 4px 6px rgb(0, 0, 0);
-    }
-    .menuicn {
-            opacity: 0;
+    ..main {
+            width: 100%;  
+            max-width: 1200px; 
+            margin: 0 auto;  
+            padding: 20px; 
+            box-sizing: border-box; 
+            
+        }
+        body {
+            overflow: hidden;
         }
 
-    @media (max-width: 768px) {
-        .signup-container {
-            width: 100%;
-        }
-        input {
-            width: 15rem; 
-        }
-        select {
-            width: 100px;
-        }
+        @media (max-width: 768px) {
+            .main {
+                width: 100vw;
+                padding: 20px;
+                box-sizing: border-box; 
+            }
 
-        .menuicn {
-            opacity: 1;
-        }
+            .signup-container {
+                margin-bottom: 20px;
+                overflow-x: auto; 
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                padding: 15px; 
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+                background-color: #f9f9f9;
+            }
+
+            label {
+                margin-top: 10px;
+                display: block;
+                font-weight: bold; 
+                color: #333; 
+            }
+
+            input[type="text"], select, input[type="file"] {
+                width: 30vh;
+                box-sizing: border-box; 
+                margin-bottom: 10px; 
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                font-size: 16px; 
+                color: #555; 
+            }
+
+            button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px; 
+                background-color: #3498db;
+                color: white;
+                cursor: pointer; 
+                transition: background-color 0.3s; 
+            }
+
+            button:hover {
+                background-color: #2980b9; 
+            }
+
+            .button-container {
+                display: flex;   
+                
+            }
+            .submit-button {
+                padding-right: 20px;
+            }
+
+            .name {
+                display: none;
+            }
+            .logo {
+                padding-left: 80px;
+            }
+            .menuicn {
+                opacity: 1;
+            }
         
     }
-    @media (min-width: 769px) and (max-width: 850px) {
-
-        .signup-container {
-            width: 100%;
-        }
-        .menuicn {
-            opacity: 1;
-        }
-    }
-    
 </style>
 
 <body>
